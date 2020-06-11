@@ -1,5 +1,16 @@
-//jshint esversion:6
 var _ = require('lodash');
+var mongoose =require('mongoose');
+mongoose instanceof mongoose.Mongoose; // true
+const m = new mongoose.Mongoose();
+mongoose.connect('mongodb://localhost/blogs', {useNewUrlParser: true, useUnifiedTopology: true});
+
+//schema
+const NewPostSchema = new mongoose.Schema({
+  title: String,
+  content:String
+});
+
+var Post= mongoose.model('Post', NewPostSchema);
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -34,17 +45,6 @@ app.get('/compose',(req,res)=>{
   
   res.render("compose.ejs");
 });
-
-app.post('/compose',(req,res)=>
-{
-   const newpost={
-     title:req.body.inputTitle,
-     content:req.body.inputPost
-   };
-  
- posts.push(newpost);
-res.redirect('/');
-});
 //allows to redirect res.redirect()
 
 app.get("/posts/:postName",function(req,res){
@@ -57,6 +57,18 @@ app.get("/posts/:postName",function(req,res){
     }
   })
 })
+
+app.post('/compose',(req,res)=>
+{
+   console.log(req.body);
+   var blog= new Post({
+    title:req.body.inputTitle,
+    content:req.body.inputPost
+   });
+   posts.push(blog);
+   blog.save();
+   res.redirect('/');
+});
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
